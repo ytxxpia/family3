@@ -44,3 +44,5 @@ The purpose of this website is to provide family members with**information relea
 - [NO] No liability: Software provided "AS IS"
 - [NO] No warranties of any kind
 - [NO] No trademark license granted
+
+**未经事宜详见许可证，最终解释权归许可证所有 / For matters not covered, please refer to the license; the final right of interpretation belongs to the license.**
