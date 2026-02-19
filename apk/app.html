@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简洁下载 · 即刻获取</title>
+    <style>
+        /* 全局极简重置，只保留最必要的样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #ffffff;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .download-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 320px;
+            max-width: 90vw;
+            background: transparent;
+            padding: 1.2rem 0.8rem 2rem 0.8rem;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .app-logo {
+            display: block;
+            width: 120px;
+            height: auto;
+            object-fit: contain;
+            margin-bottom: 2rem;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.02));
+        }
+
+        /* 下载按钮 — 无阴影，保持纯粹主题色 */
+        .download-btn {
+            display: inline-block;
+            background-color: #0079FF;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 1.6rem;
+            font-weight: 450;
+            letter-spacing: 0.02em;
+            padding: 0.9rem 2.6rem;
+            border-radius: 48px;
+            border: none;
+            cursor: pointer;
+            line-height: 1.2;
+            text-align: center;
+            user-select: none;
+            transition: all 0.18s ease;
+            /* 移除所有阴影 */
+            box-shadow: none;
+        }
+
+        .download-btn:hover {
+            background-color: #0066d9;
+            transform: translateY(-2px);
+            /* 移除悬停阴影 */
+            box-shadow: none;
+        }
+
+        .download-btn:active {
+            transform: translateY(1px);
+            background-color: #005bbf;
+            /* 移除点击阴影 */
+            box-shadow: none;
+        }
+
+        .download-btn:focus-visible {
+            outline: 2px solid #0079FF;
+            outline-offset: 4px;
+        }
+
+        /* 确保没有任何多余内容 */
+        body::before,
+        body::after,
+        .download-card::before,
+        .download-card::after {
+            display: none !important;
+            content: none !important;
+        }
+
+        @media (max-width: 480px) {
+            .download-btn {
+                font-size: 1.5rem;
+                padding: 0.8rem 2.2rem;
+            }
+            .app-logo {
+                width: 100px;
+                margin-bottom: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="download-card">
+        <img class="app-logo" src="applogo.png" alt="软件图标" draggable="false">
+        <a href="app.apk" class="download-btn" download="app.apk">下载</a>
+    </div>
+</body>
+</html>
