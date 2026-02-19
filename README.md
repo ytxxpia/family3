@@ -29,7 +29,6 @@ This repository is designed for family members to conveniently access informatio
 
  For matters not covered, refer to the license; the final right of interpretation belongs to the license.
 
----
 
 ## 关于Apache License 2.0许可证的说明
 
