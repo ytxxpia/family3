@@ -27,7 +27,7 @@ This repository is designed for family members to conveniently access informatio
 - [NO] No warranties of any kind
 - [NO] No trademark license granted
 
-未经事宜详见许可证，最终解释权归许可证所有 / For matters not covered, refer to the license; the final right of interpretation belongs to the license.
+ For matters not covered, refer to the license; the final right of interpretation belongs to the license.
 
 ---
 
@@ -50,4 +50,5 @@ This repository is designed for family members to conveniently access informatio
 - [禁止] 不提供任何明示或暗示的保证
 - [禁止] 不授予商标使用权
 
-未经事宜详见许可证，最终解释权归许可证所有 / For matters not covered, refer to the license; the final right of interpretation belongs to the license.
+未经事宜详见许可证，最终解释权归许可证所有
+
