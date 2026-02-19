@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>简洁下载 · 即刻获取</title>
     <style>
-        /* 全局极简重置，只保留最必要的样式 */
+        /* 全局重置，极简风格 */
         * {
             margin: 0;
             padding: 0;
@@ -26,24 +26,41 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 320px;
+            width: 380px;               /* 略宽，适应放大后的图片 */
             max-width: 90vw;
             background: transparent;
-            padding: 1.2rem 0.8rem 2rem 0.8rem;
-            border-radius: 0;
-            box-shadow: none;
+            padding: 1.5rem 1rem 2.5rem 1rem;
         }
 
+        /* 图片放大 */
         .app-logo {
             display: block;
-            width: 120px;
+            width: 180px;                /* 原120px → 180px，更大更突出 */
             height: auto;
             object-fit: contain;
-            margin-bottom: 2rem;
-            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.02));
+            margin-bottom: 1.2rem;        /* 与下方文字间距 */
+            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.02)); /* 极淡阴影，不影响简洁 */
         }
 
-        /* 下载按钮 — 无阴影，保持纯粹主题色 */
+        /* 新添加的灰色信息文本 */
+        .app-info {
+            font-size: 1rem;              /* 约16px，适中 */
+            color: #777;                   /* 灰色，符合要求 */
+            text-align: center;
+            letter-spacing: 0.3px;
+            margin-bottom: 2rem;           /* 与按钮的间距 */
+            font-weight: 400;
+            line-height: 1.5;
+            /* 保证没有任何装饰 */
+        }
+
+        /* 分隔符“│”自带，无需额外处理 */
+        .app-info span {
+            /* 可以微调间距，但保留原样 */
+            margin: 0 2px;
+        }
+
+        /* 下载按钮 — 无阴影，纯粹主题色 */
         .download-btn {
             display: inline-block;
             background-color: #0079FF;
@@ -60,21 +77,18 @@
             text-align: center;
             user-select: none;
             transition: all 0.18s ease;
-            /* 移除所有阴影 */
-            box-shadow: none;
+            box-shadow: none;               /* 确保无阴影 */
         }
 
         .download-btn:hover {
             background-color: #0066d9;
             transform: translateY(-2px);
-            /* 移除悬停阴影 */
             box-shadow: none;
         }
 
         .download-btn:active {
             transform: translateY(1px);
             background-color: #005bbf;
-            /* 移除点击阴影 */
             box-shadow: none;
         }
 
@@ -83,7 +97,7 @@
             outline-offset: 4px;
         }
 
-        /* 确保没有任何多余内容 */
+        /* 确保无多余伪元素 */
         body::before,
         body::after,
         .download-card::before,
@@ -92,21 +106,32 @@
             content: none !important;
         }
 
+        /* 移动端适配 */
         @media (max-width: 480px) {
+            .app-logo {
+                width: 140px;               /* 手机上也适当放大，但稍小一点 */
+                margin-bottom: 1rem;
+            }
+            .app-info {
+                font-size: 0.9rem;
+                margin-bottom: 1.5rem;
+            }
             .download-btn {
                 font-size: 1.5rem;
                 padding: 0.8rem 2.2rem;
-            }
-            .app-logo {
-                width: 100px;
-                margin-bottom: 1.8rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="download-card">
+        <!-- 同级目录下的软件图标 -->
         <img class="app-logo" src="applogo.png" alt="软件图标" draggable="false">
+
+        <!-- 新增灰色信息：无广告│2MB│★★★★★5.0 居中 -->
+        <div class="app-info">无广告│2MB│★★★★★5.0</div>
+
+        <!-- 下载按钮，指向同级目录 app.apk -->
         <a href="app.apk" class="download-btn" download="app.apk">下载</a>
     </div>
 </body>
