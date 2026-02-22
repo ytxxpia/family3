@@ -1,0 +1,11 @@
+# 禁止 Google 爬虫
+User-agent: Googlebot
+Disallow: /
+
+# 禁止 Bing 爬虫
+User-agent: Bingbot
+Disallow: /
+
+# 允许其他所有爬虫（如果你希望其他搜索引擎可以抓取）
+User-agent: *
+Disallow:
