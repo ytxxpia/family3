@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>阅读器</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* 极简样式，只有文字和经典超链接 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             background: white;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -24,113 +29,152 @@
             width: 100%;
             word-wrap: break-word;
         }
-        /* 最老式超链接：蓝色+下划线，无内边距，点击区域仅限文本 */
+        /* 最老式超链接：蓝色+下划线，点击区域仅限文本 */
         #share-link {
-            display: inline;               /* 确保是行内元素，宽度由文本决定 */
-            color: #0066cc;                 /* 经典蓝色 */
-            text-decoration: underline;     /* 下划线 */
+            display: inline;               /* 行内，宽度由文本决定 */
+            color: #0066cc;
+            text-decoration: underline;
             cursor: pointer;
             font-size: 1rem;
             font-family: inherit;
             background: none;
             border: none;
             outline: none;
-            /* 无 padding，无 margin 改动，保持原始点击区域 */
-            user-select: none;               /* 防止选中（可选，不影响点击区域） */
-            -webkit-touch-callout: none;     /* 禁用长按菜单，保证长按事件正常工作 */
+            user-select: none;               /* 防止选中，但不影响点击区域 */
+            -webkit-touch-callout: none;     /* 禁用长按菜单，保证长按事件 */
         }
         #share-link:hover {
-            color: #0052a3;                  /* 悬停加深一点 */
+            color: #0052a3;
         }
     </style>
 </head>
 <body>
     <div class="reader">
+        <!-- Markdown 渲染容器，初始空白 -->
         <div id="markdown-container"></div>
+        <!-- 经典分享链接，点击区域仅限“分享”二字 -->
         <a href="#" id="share-link">分享</a>
     </div>
 
-    <!-- 同级目录 marked.js (如果加载失败，降级处理) -->
+    <!-- 同级目录下的 marked.js（若加载失败会降级显示源码） -->
     <script src="./marked.js"></script>
     <script>
         (function() {
+            // ---------- DOM 元素 ----------
             const container = document.getElementById('markdown-container');
             const shareLink = document.getElementById('share-link');
 
-            let lastSource = '';
-            let longPressTimer = null;
-            let longPressTriggered = false;
-            const LONG_PRESS_DELAY = 500;
+            // ---------- 状态变量 ----------
+            let lastSource = '';                // 最后收到的 Markdown 源码
+            let longPressTimer = null;           // 长按定时器
+            let longPressTriggered = false;       // 是否已经触发长按（用于屏蔽随后的 click）
+            const LONG_PRESS_DELAY = 500;         // 长按阈值（毫秒）
 
             // ---------- 辅助函数 ----------
-            function clearContainer() { container.innerHTML = ''; }
+            function clearContainer() {
+                container.innerHTML = '';
+            }
 
+            // 简单的 HTML 转义（用于降级显示）
             function escapeHtml(unsafe) {
-                return unsafe.replace(/[&<>"]/g, m => {
-                    if(m === '&') return '&amp;';
-                    if(m === '<') return '&lt;';
-                    if(m === '>') return '&gt;';
-                    if(m === '"') return '&quot;';
+                return unsafe.replace(/[&<>"]/g, function(m) {
+                    if (m === '&') return '&amp;';
+                    if (m === '<') return '&lt;';
+                    if (m === '>') return '&gt;';
+                    if (m === '"') return '&quot;';
                     return m;
                 });
             }
 
+            // ---------- Markdown 渲染（支持降级）----------
             function renderMarkdown(markdownText) {
-                console.log('收到消息:', markdownText);
+                console.log('[阅读器] 收到消息:', markdownText);
                 let source = '';
                 try {
+                    // 统一转换为字符串
                     if (typeof markdownText !== 'string') {
-                        if (markdownText === null || markdownText === undefined) source = '';
-                        else if (typeof markdownText === 'object') {
-                            try { source = JSON.stringify(markdownText, null, 2); }
-                            catch (e) { source = String(markdownText); }
-                        } else source = String(markdownText);
-                    } else source = markdownText;
+                        if (markdownText === null || markdownText === undefined) {
+                            source = '';
+                        } else if (typeof markdownText === 'object') {
+                            try {
+                                source = JSON.stringify(markdownText, null, 2);
+                            } catch (e) {
+                                source = String(markdownText);
+                            }
+                        } else {
+                            source = String(markdownText);
+                        }
+                    } else {
+                        source = markdownText;
+                    }
 
+                    // 保存源码供分享使用
                     lastSource = source;
 
+                    // 空消息清空容器
                     if (source.trim() === '') {
                         clearContainer();
                         return;
                     }
 
+                    // 尝试使用 marked 解析
                     let html = '';
                     if (typeof marked !== 'undefined' && typeof marked.parse === 'function') {
                         html = marked.parse(source);
                     } else if (typeof marked !== 'undefined' && typeof marked === 'function') {
                         html = marked(source);
                     } else {
-                        console.warn('marked 不可用，以纯文本显示源码');
+                        console.warn('[阅读器] marked 不可用，降级为纯文本显示');
                         html = `<pre style="white-space: pre-wrap;">${escapeHtml(source)}</pre>`;
                     }
 
                     container.innerHTML = html;
                 } catch (err) {
-                    console.error('渲染失败，降级为纯文本:', err);
+                    console.error('[阅读器] 渲染失败，降级为纯文本:', err);
                     container.innerHTML = `<pre style="white-space: pre-wrap;">${escapeHtml(source)}</pre>`;
                 }
             }
 
+            // ---------- 分享功能：打开 share.html 并发送源码 ----------
             function performShare() {
-                console.log('执行分享：打开 share.html');
+                console.log('[阅读器] performShare 开始执行');
+                console.log('[阅读器] 最后保存的源码:', lastSource);
+
                 const newWin = window.open('share.html');
                 if (!newWin) {
-                    console.warn('无法打开 share.html，请检查弹窗拦截');
+                    console.warn('[阅读器] 打开 share.html 失败，可能被弹窗拦截');
                     return;
                 }
+
+                console.log('[阅读器] 新窗口已打开，等待 load 事件...');
                 newWin.addEventListener('load', function() {
-                    newWin.postMessage(lastSource, '*');
+                    console.log('[阅读器] share.html load 事件触发，等待 150ms 后发送...');
+                    // 延迟发送，确保 share.html 中的监听器已注册
+                    setTimeout(() => {
+                        try {
+                            // 使用 '*' 允许跨域发送（方便调试）
+                            newWin.postMessage(lastSource, '*');
+                            console.log('[阅读器] postMessage 已发送 (targetOrigin="*")');
+                        } catch (e) {
+                            console.error('[阅读器] postMessage 发送失败:', e);
+                        }
+                    }, 150); // 150ms 通常足够
                 }, { once: true });
             }
 
             // ---------- 长按事件处理 ----------
             function startLongPress(e) {
-                e.preventDefault();   // 阻止默认（拖拽、选中、弹出菜单）
-                if (longPressTimer) clearTimeout(longPressTimer);
+                // 阻止默认（如选中文本、拖拽、右键菜单等）
+                e.preventDefault();
+
+                if (longPressTimer) {
+                    clearTimeout(longPressTimer);
+                }
                 longPressTriggered = false;
 
                 longPressTimer = setTimeout(() => {
-                    console.log('长按触发，发送消息给自身');
+                    console.log('[阅读器] 长按触发，发送消息给自身');
+                    // 向自身发送消息（触发渲染）
                     window.postMessage('**hallo would!**', '*');
                     longPressTriggered = true;
                     longPressTimer = null;
@@ -142,9 +186,11 @@
                     clearTimeout(longPressTimer);
                     longPressTimer = null;
                 }
+                // 注意：如果长按已触发，longPressTriggered 保持 true，用于屏蔽 click
             }
 
             // ---------- 事件绑定 ----------
+            // 鼠标/触摸事件：开始长按
             shareLink.addEventListener('mousedown', startLongPress);
             shareLink.addEventListener('mouseup', cancelLongPress);
             shareLink.addEventListener('mouseleave', cancelLongPress);
@@ -152,19 +198,25 @@
             shareLink.addEventListener('touchend', cancelLongPress);
             shareLink.addEventListener('touchcancel', cancelLongPress);
 
+            // 单击事件：如果是由长按触发的则忽略，否则执行分享
             shareLink.addEventListener('click', function(e) {
                 e.preventDefault();   // 阻止 # 跳转
                 if (longPressTriggered) {
+                    // 此次单击是长按后自动触发的，忽略
                     longPressTriggered = false;
                     return;
                 }
                 performShare();
             });
 
-            window.addEventListener('message', event => renderMarkdown(event.data));
+            // 监听所有 postMessage 消息（来自父页面、自身、其他）
+            window.addEventListener('message', function(event) {
+                renderMarkdown(event.data);
+            });
 
+            // 初始清空容器，保证空白
             clearContainer();
-            console.log('经典超链接（原始点击区域）已就绪');
+            console.log('[阅读器] 已就绪，单击“分享”打开 share.html 并发送源码，长按自我发送');
         })();
     </script>
 </body>
