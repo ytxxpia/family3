@@ -119,7 +119,7 @@
                     return;
                 }
                 newWin.addEventListener('load', function() {
-                    newWin.postMessage(lastSource, window.location.origin);
+                    newWin.postMessage(lastSource, '*');
                 }, { once: true });
             }
 
