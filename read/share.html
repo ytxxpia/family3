@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>超级分享</title>
+    <style>
+        /* 极简样式：白色背景，方形输入框，微圆角彩色按钮，始终并排 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            padding: 16px;
+            margin: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+        }
+        .share-textarea {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.2rem;
+            line-height: 1.5;
+            border: 1px solid #aaa;
+            border-radius: 4px;          /* 近乎方形，微圆 */
+            resize: vertical;
+            font-family: inherit;
+            background: white;
+            color: #1e1e1e;
+            margin-bottom: 20px;
+            box-shadow: none;
+            outline: none;
+        }
+        .share-textarea:focus {
+            border-color: #555;
+        }
+        .button-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: nowrap;            /* 强制不换行，始终并排 */
+        }
+        .action-btn {
+            flex: 1 1 0;                  /* 平均分配宽度 */
+            min-width: 0;                  /* 允许内容收缩 */
+            padding: 14px 10px 14px 36px; /* 左侧留出图标空间，距离调整更近（原40px→36px） */
+            background: #0079FF;           /* 主题蓝色 */
+            border: none;
+            border-radius: 6px;            /* 微微圆角 */
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: white;
+            cursor: pointer;
+            transition: 0.1s ease;
+            box-shadow: none;
+            position: relative;
+            text-align: center;
+            white-space: nowrap;            /* 防止文字换行，保持按钮高度一致 */
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .action-btn:hover {
+            background: #0063cc;
+        }
+        .action-btn:active {
+            background: #004fa3;
+            transform: scale(0.98);
+        }
+
+        /* 图标字体定义 (使用相对路径) */
+        @font-face {
+            font-family: 'Font Awesome Brands';
+            font-style: normal;
+            font-weight: 400;
+            src: url('../FontAwesome/fa-brands-400.woff2') format('woff2'),
+                 url('../FontAwesome/ttf/fa-brands-400.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'Font Awesome Solid';
+            font-style: normal;
+            font-weight: 900;
+            src: url('../FontAwesome/fa-solid-900.woff2') format('woff2'),
+                 url('../FontAwesome/ttf/fa-solid-900.ttf') format('truetype');
+        }
+
+        /* 按钮图标通用样式 - 调小left值使图标离字更近 */
+        .action-btn::before {
+            font-family: 'Font Awesome Solid', 'Font Awesome Brands', sans-serif;
+            font-weight: 900;
+            position: absolute;
+            left: 12px;                    /* 原16px → 12px，更靠近文字 */
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        /* 系统分享按钮使用 solid 的 share-from-square (Unicode f14d) */
+        #systemShareBtn::before {
+            content: "\f14d";  /* fa-share-from-square */
+        }
+
+        /* 微信分享按钮使用 brands 的 weixin (Unicode f1d7) */
+        #wechatShareBtn::before {
+            font-family: 'Font Awesome Brands', 'Font Awesome Solid', sans-serif;
+            content: "\f1d7";  /* fa-weixin */
+        }
+
+        /* 小屏幕适配：进一步缩小间距 */
+        @media (max-width: 480px) {
+            .action-btn {
+                font-size: 0.9rem;
+                padding-left: 30px;       /* 原34px → 30px */
+            }
+            .action-btn::before {
+                font-size: 1rem;
+                left: 10px;                /* 原12px → 10px */
+            }
+        }
+
+        /* 超小屏幕继续压缩 */
+        @media (max-width: 360px) {
+            .action-btn {
+                font-size: 0.8rem;
+                padding-left: 26px;        /* 原30px → 26px */
+            }
+            .action-btn::before {
+                font-size: 0.9rem;
+                left: 8px;                 /* 原10px → 8px */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 纯输入框，只读显示接收到的内容。初始显示 **Welcome, user** -->
+        <textarea id="shareInput" class="share-textarea" rows="4" readonly>**Welcome, user**</textarea>
+
+        <!-- 两个功能按钮，始终并排，带图标 -->
+        <div class="button-row">
+            <button class="action-btn" id="systemShareBtn">系统分享</button>
+            <button class="action-btn" id="wechatShareBtn">微信分享</button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // 获取输入框元素
+            const shareInput = document.getElementById('shareInput');
+            
+            // --- 监听来自外部的 postMessage (任何来源) ---
+            window.addEventListener('message', function(event) {
+                let received = event.data;
+                let textContent = '';
+
+                // 尝试提取字符串
+                if (typeof received === 'string') {
+                    textContent = received;
+                } else if (received && typeof received === 'object') {
+                    // 常见字段匹配：content, text, message, body, shareText ...
+                    const possible = ['content', 'text', 'message', 'body', 'shareText', 'txt'];
+                    for (let key of possible) {
+                        if (received[key] && typeof received[key] === 'string') {
+                            textContent = received[key];
+                            break;
+                        }
+                    }
+                    // 如果没有匹配字段，转为JSON字符串（仅当不是默认对象字符串时）
+                    if (!textContent) {
+                        try {
+                            const str = received.toString();
+                            if (str && str !== '[object Object]') {
+                                textContent = str;
+                            } else {
+                                textContent = JSON.stringify(received);
+                            }
+                        } catch {
+                            textContent = '[无法解析]';
+                        }
+                    }
+                } else if (received !== undefined && received !== null) {
+                    textContent = String(received);
+                }
+
+                // 更新输入框 (直接覆盖，移除示例内容)
+                shareInput.value = textContent;
+            });
+
+            // --- 系统分享 (Web Share API) ---
+            document.getElementById('systemShareBtn').addEventListener('click', async function() {
+                const textToShare = shareInput.value; // 直接从输入框获取最新文本
+
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: '超级分享',
+                            text: textToShare,
+                            url: window.location.href,  // 可选
+                        });
+                        // 分享成功——无提示，保持简洁
+                    } catch (err) {
+                        if (err.name !== 'AbortError') {
+                            // 非用户取消的异常，尝试复制作为降级
+                            try {
+                                await navigator.clipboard.writeText(textToShare);
+                                alert('系统分享失败，文本已复制到剪贴板');
+                            } catch {
+                                alert('系统分享不可用，且无法复制文本');
+                            }
+                        }
+                    }
+                } else {
+                    // 降级：复制文本
+                    try {
+                        await navigator.clipboard.writeText(textToShare);
+                        alert('系统分享不支持，文本已复制到剪贴板');
+                    } catch {
+                        alert('系统分享不支持，且复制失败');
+                    }
+                }
+            });
+
+            // --- 微信分享: 先复制，再尝试拉起微信 (仅移动端) ---
+            document.getElementById('wechatShareBtn').addEventListener('click', async function() {
+                const textToShare = shareInput.value;
+
+                // 1. 复制到剪贴板
+                let copySuccess = false;
+                try {
+                    await navigator.clipboard.writeText(textToShare);
+                    copySuccess = true;
+                } catch (e) {
+                    // 复制失败时提示用户，提示关闭后仍然尝试拉起微信
+                    alert('复制失败，请手动复制文本');
+                    // 继续执行后面的拉起操作
+                }
+
+                // 2. 尝试打开微信 (使用标准URL scheme)
+                const isMobile = /iphone|ipad|ipod|android/i.test(navigator.userAgent);
+                if (isMobile) {
+                    // 使用 iframe 尝试触发 (避免页面跳转)
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    iframe.src = 'weixin://';
+                    document.body.appendChild(iframe);
+                    setTimeout(() => {
+                        iframe.remove();
+                    }, 500);
+
+                    // 额外用 location.href 触发 (部分浏览器需要)
+                    setTimeout(() => {
+                        window.location.href = 'weixin://';
+                    }, 100);
+                } else {
+                    // 桌面环境提示
+                    alert('请在手机端使用微信打开');
+                }
+
+                // 复制成功时不额外弹窗，静默拉起
+            });
+        })();
+    </script>
+</body>
+</html>
