@@ -38,10 +38,10 @@
             padding: 2rem 1rem 2.5rem 1rem;
         }
 
-        /* Logo 图片 - 明显大于下载按钮 */
+        /* Logo 图片 - 190px */
         .app-logo {
             display: block;
-            width: 220px;              /* 增大到220px，比下载按钮大很多 */
+            width: 190px;              /* 调整为190px */
             height: auto;
             object-fit: contain;
             margin-bottom: 0.5rem;
@@ -61,7 +61,7 @@
             font-size: 1rem;
             color: #777;
             text-align: center;
-            margin-bottom: 2.5rem;      /* 增加底部间距，让按钮更独立 */
+            margin-bottom: 2.5rem;
             font-weight: 400;
             line-height: 1.5;
             font-family: 'FontAwesome', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -90,12 +90,12 @@
             font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
         }
 
-        /* 圆形下载按钮 - 尺寸明显小于Logo */
+        /* 圆形下载按钮 - 使用下载图标 (云+向下箭头) */
         .download-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 64px;                /* 减小到64px，明显小于220px的Logo */
+            width: 64px;
             height: 64px;
             background-color: #0079FF;
             color: #ffffff;
@@ -106,8 +106,13 @@
             transition: all 0.18s ease;
             box-shadow: none;
             font-family: 'FontAwesome', sans-serif;
-            font-size: 1.8rem;          /* 图标大小相应调小 */
+            font-size: 2rem;              /* 稍大一点让图标更清晰 */
             margin-top: 0.5rem;
+        }
+
+        /* 下载图标:  (fa-download) - 云+向下箭头 */
+        .download-btn::before {
+            content: "\f019";              /* FontAwesome 下载图标 */
         }
 
         .download-btn:hover {
@@ -139,7 +144,7 @@
         /* 移动端适配 */
         @media (max-width: 480px) {
             .app-logo {
-                width: 170px;            /* 移动端也保持大于按钮 */
+                width: 160px;            /* 移动端相应调整 */
                 margin-bottom: 0.3rem;
             }
             .app-name {
@@ -153,14 +158,14 @@
             .download-btn {
                 width: 56px;
                 height: 56px;
-                font-size: 1.6rem;
+                font-size: 1.8rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="download-card">
-        <!-- Logo: 220px (明显大于下载按钮) -->
+        <!-- Logo: 190px -->
         <img class="app-logo" src="applogo.png" alt="FamilyClubApp Logo" draggable="false">
         
         <!-- 软件名称 -->
@@ -181,8 +186,8 @@
             <span class="rating-text">4.5</span>
         </div>
 
-        <!-- 圆形下载按钮 (64px) - 明显小于Logo -->
-        <a href="#" class="download-btn" id="downloadBtn">&#xf103;</a>
+        <!-- 圆形下载按钮 - 使用下载图标 -->
+        <a href="#" class="download-btn" id="downloadBtn"></a>
     </div>
 
     <script>
