@@ -2,11 +2,10 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <!-- 关键：添加 viewport 适配移动端 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>家庭空间 · 汇总</title>
     <style>
-        /* 极简直角风格，无圆角、无毛玻璃、无阴影、无边框装饰 */
+        /* 基础风格：极小圆角（6px），无毛玻璃无阴影 */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -16,53 +15,37 @@
             min-height: 100vh;
             background: linear-gradient(180deg, #0079FF 0%, #ffffff 100%);
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            /* 基础字体设为 16px，确保 1rem = 16px */
-            font-size: 16px;
+            font-size: 16px; /* 基准1rem=16px */
             padding: 0;
         }
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 1.5rem 1rem; /* 手机上左右内边距适当减小 */
+            padding: 1.5rem 1rem;
         }
-        /* 广告图区域——无任何修饰，直接原生块 */
-        .ad-link {
-            display: block;
-            width: 100%;
-            background: none;
-            text-decoration: none;
-            line-height: 0;
-        }
-        .ad-img {
-            display: block;
-            width: 100%;
-            height: auto;
-            border: none;
-            background: #e0e8ff; /* 占位背景，图片加载后覆盖 */
-        }
-        /* 标题：使用 FontAwesome 图标，字体调小一些适合手机 */
+        /* 标题：字号略减 */
         h1 {
-            font-size: 2rem;       /* 32px */
+            font-size: 1.8rem;       /* 28.8px */
             font-weight: 400;
-            margin: 1.2rem 0 1.2rem 0;
+            margin: 1rem 0 1.2rem 0;
             letter-spacing: 1px;
             color: #0a1a2f;
         }
         /* 两列布局 */
         .row {
             display: flex;
-            gap: 1rem;             /* 手机上间隙稍小 */
+            gap: 1rem;
             margin-bottom: 2rem;
             flex-wrap: wrap;
         }
-        /* 天气块：直角，无特效，纯色极浅背景 */
+        /* 天气块：直角 → 6px圆角 */
         .weather-block {
             flex: 1 1 280px;
             background: rgba(255, 255, 255, 0.3);
-            padding: 1.2rem 1rem;  /* 内边距微调 */
+            padding: 1.2rem 1rem;
             cursor: pointer;
             border: none;
-            border-radius: 0;
+            border-radius: 6px;
         }
         /* 过期警告背景 */
         .weather-block.expired-bg {
@@ -74,53 +57,53 @@
             gap: 0.8rem;
         }
         .weather-icon {
-            font-size: 2.5rem;     /* 40px */
+            font-size: 2.2rem;       /* 35.2px */
             width: 1.5em;
             text-align: center;
             color: #1e3a6b;
         }
         .weather-info {
-            font-size: 1.5rem;     /* 24px */
+            font-size: 1.3rem;       /* 20.8px */
             font-weight: 350;
             line-height: 1.3;
         }
         .expired-warning {
             margin-top: 0.5rem;
-            font-size: 0.85rem;    /* 13.6px */
+            font-size: 0.8rem;       /* 12.8px */
             color: #b91c1c;
             display: flex;
             align-items: center;
             gap: 0.4rem;
         }
-        /* 每日一图容器：作为链接，覆盖整个区域 */
+        /* 每日一图容器：强制16:9，6px圆角 */
         .daily-image-link {
-            flex: 2 1 400px;
+            flex: 2 1 400px;          /* 保持弹性，基础宽度400px */
+            aspect-ratio: 16 / 9;      /* 关键：强制16:9比例 */
             display: block;
             text-decoration: none;
             color: inherit;
             background: transparent;
-            border-radius: 0;
-            overflow: hidden;
+            border-radius: 6px;
+            overflow: hidden;         /* 确保 iframe 也显示圆角 */
             cursor: pointer;
         }
         .daily-image-link iframe {
             width: 100%;
-            height: 100%;
-            min-height: 200px;      /* 手机上高度稍减 */
+            height: 100%;              /* 填充父容器，保持比例 */
             border: none;
             display: block;
             background: rgba(255,255,255,0.2);
-            pointer-events: none;
+            pointer-events: none;      /* 使点击由父链接处理 */
         }
-        /* 文章列表区域 */
+        /* 文章列表区域：6px圆角 */
         .article-section {
             background: rgba(255, 255, 255, 0.3);
             padding: 1.2rem 1.2rem;
-            border-radius: 0;
+            border-radius: 6px;
         }
         .article-section h2 {
             font-weight: 350;
-            font-size: 1.6rem;      /* 25.6px */
+            font-size: 1.5rem;        /* 24px */
             margin-bottom: 0.5rem;
         }
         .article-list {
@@ -130,12 +113,12 @@
         .article-list li {
             margin-bottom: 0.8rem;
             border-bottom: 1px dashed rgba(0,0,0,0.1);
-            padding-bottom: 0.6rem;
+            padding-bottom: 0.5rem;
         }
         .article-list a {
             text-decoration: none;
             color: #003c8b;
-            font-size: 1.1rem;      /* 17.6px 适合手机阅读 */
+            font-size: 1rem;          /* 16px */
             display: inline-block;
             transition: opacity 0.1s;
             cursor: pointer;
@@ -160,22 +143,23 @@
         }
         .modal-content {
             background: white;
-            width: 95%;             /* 手机上宽度占更多 */
+            width: 95%;
             max-width: 500px;
-            height: 450px;          /* 高度稍增，适应手机 */
+            height: 450px;
             padding: 0;
-            border-radius: 0;
+            border-radius: 6px;       /* 小圆角 */
             position: relative;
             border: none;
+            overflow: hidden;         /* 裁剪 iframe 为圆角 */
         }
         .modal-close {
             position: absolute;
             top: 8px; right: 12px;
-            font-size: 2.2rem;      /* 35px 更容易点击 */
+            font-size: 2.2rem;
             color: #333;
             cursor: pointer;
             background: transparent;
-            width: 44px;            /* 增大点击区域 */
+            width: 44px;
             height: 44px;
             display: flex;
             align-items: center;
@@ -188,7 +172,7 @@
             width: 100%;
             height: 100%;
             border: none;
-            border-radius: 0;
+            border-radius: 0;         /* 无圆角，但父容器 overflow:hidden 会裁剪 */
         }
         /* 图标字体 */
         @font-face {
@@ -213,11 +197,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-<!-- 顶端广告图 -->
-<a href="apk/app.html" class="ad-link" target="_blank" rel="noopener">
-    <img src="ads/ads.png" alt="广告：下载应用" class="ad-img">
-</a>
-
 <div class="container">
     <h1><i class="fas fa-home"></i> 家庭空间</h1>
 
@@ -234,7 +213,7 @@
             </div>
         </div>
 
-        <!-- 每日一图区域 -->
+        <!-- 每日一图区域：强制16:9 -->
         <a href="api/bing.html" target="_blank" rel="noopener" class="daily-image-link">
             <iframe src="api/index-see/index-bing.html" title="每日一图" loading="lazy"></iframe>
         </a>
@@ -349,12 +328,11 @@
             weatherModule.classList.remove('expired-bg');
             expiryWarningDiv.style.display = 'none';
 
-            // 不关闭模态框，让用户继续查看详细天气
+            // 不关闭模态框
         }
 
         weatherModule.addEventListener('click', () => {
             modal.classList.add('active');
-            // 每次打开重新加载 iframe
             weatherIframe.src = 'api/weather.html';
         });
 
