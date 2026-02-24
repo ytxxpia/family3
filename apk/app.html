@@ -194,7 +194,7 @@
         document.getElementById('downloadBtn').addEventListener('click', function(e) {
             e.preventDefault();
             
-            if (confirm('单机应用，报毒为正常现象，签名不一致为正常现象!!!')) {
+            if (confirm('应用出现部分故障，正在努力修复中…，如果你不介意，点击“确认”下载。单机应用可能提示病毒')) {
                 const link = document.createElement('a');
                 link.href = 'app.apk';
                 link.download = 'app.apk';
