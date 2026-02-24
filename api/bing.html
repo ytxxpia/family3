@@ -3,36 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>极简·必应每日一图</title>
-    <!-- 完全按照要求: 只有纯文字，下载按钮是一个与文字等大的图标 -->
-    <!-- 使用指定路径 FontAwesome (../FontAwesome/fa-solid-900.woff2) 确保图标是纯图标，与文字等大 -->
+    <title>极简 · 必应每日一图</title>
     <style>
-        /* 字体引入 —— 严格使用本地路径 */
+        /* ----- 字体定义：优先相对路径，备选 CDN ----- */
         @font-face {
             font-family: 'FaSolid';
-            src: url('../FontAwesome/fa-solid-900.woff2') format('woff2');
+            src: url('../FontAwesome/fa-solid-900.woff2') format('woff2'),
+                 url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/webfonts/fa-solid-900.woff2') format('woff2'),
+                 url('https://use.fontawesome.com/releases/v6.0.0-beta3/webfonts/fa-solid-900.woff2') format('woff2');
             font-weight: 900;
             font-style: normal;
             font-display: block;
         }
 
-        /* 图标基础类 — 只设置和文字等大的属性，没有任何额外背景/边框 */
+        /* 所有使用图标的元素统一继承字体 */
         .fas {
-            font-family: 'FaSolid', 'Font Awesome 6 Free', sans-serif;
+            font-family: 'FaSolid', 'Font Awesome 6 Free', 'FontAwesome', sans-serif;
             font-weight: 900;
             font-style: normal;
             font-variant: normal;
             text-rendering: auto;
-            line-height: 1;          /* 保证图标高度与1em一致 */
+            line-height: 1;
             display: inline-block;
-            width: auto;
-            height: auto;
-            font-size: 1em;           /* 继承父元素文字大小，实现与文字等大 */
-            vertical-align: baseline;  /* 基线对齐，更像文字的一部分 */
-            color: currentColor;       /* 继承文字颜色，完全融入 */
+            font-size: 1em;           /* 与文字等大 */
+            vertical-align: baseline;
+            color: currentColor;
         }
 
-        /* 重置所有边距，极致精简 */
+        /* 重置 & 基础 */
         * {
             margin: 0;
             padding: 0;
@@ -41,17 +39,17 @@
 
         body {
             min-height: 100vh;
-            background-color: #0c0f14;
+            background-color: #0b1117;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
             transition: background-image 0.4s ease;
             position: relative;
         }
 
-        /* 极简容器：只做最基础的覆盖，没有任何装饰块、磨砂、背景框 */
+        /* 极简容器：完全透明，只沉底文字 */
         .minimal-container {
             position: relative;
             width: 100%;
@@ -59,82 +57,76 @@
             padding: 2rem 2.5rem;
             display: flex;
             flex-direction: column;
-            justify-content: flex-end;    /* 内容沉底 */
-            background: transparent;       /* 完全透明，让背景图彻底裸露 */
+            justify-content: flex-end;
+            background: transparent;
             color: white;
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7); /* 仅有的可读性保障 */
-            pointer-events: none;          /* 下层不拦截事件，除了按钮区域 */
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+            pointer-events: none;
         }
 
-        /* 左下角纯文字区域 —— 只有三行纯文字 + 一个图标按钮（与文字等大） */
+        /* 左下纯文字区 */
         .bottom-left {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            gap: 0.2rem;                  /* 文字间微小间隙 */
-            pointer-events: auto;          /* 让按钮可点击 */
-            max-width: 800px;
+            gap: 0.2rem;
+            pointer-events: auto;
+            max-width: 900px;
         }
 
-        /* 图片标题 —— 纯文字，不加任何修饰 */
+        /* 标题 — 纯文字 */
         .title {
             font-size: 2.8rem;
             font-weight: 350;
             line-height: 1.2;
-            letter-spacing: -0.01em;
             color: white;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
             margin: 0;
-            padding: 0;
-            border: none;
         }
 
-        /* 版权信息 —— 纯文字 */
+        /* 版权 — 纯文字 */
         .copyright {
             font-size: 1.1rem;
             font-weight: 330;
             color: rgba(255, 255, 255, 0.9);
             text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8);
-            margin: 0.1rem 0 0.2rem 0;
-            padding: 0;
-            opacity: 0.9;
-            letter-spacing: 0.2px;
+            margin: 0.1rem 0 0.2rem;
         }
 
-        /* 下载行 —— 只包含一个与文字等大的图标，没有任何背景/边框/填充 */
+        /* 下载图标行：无任何背景/边框 */
         .download-wrapper {
-            margin-top: 0.4rem;
+            margin-top: 0.5rem;
             display: flex;
             align-items: center;
-            justify-content: center;
         }
 
-        /* 下载链接 —— 纯粹图标，尺寸完全由文字大小决定，无背景无边框无内边距 */
+        /* 下载链接：纯图标，与文字等大，必须使用图标字体 */
         .download-link {
-            display: inline-flex;          /* 使图标正常排列 */
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            color: white;                  /* 纯白图标，融入文字 */
-            text-decoration: none;          /* 去掉下划线 */
-            font-size: 1.5rem;              /* 图标大小与周围文字协调，比正文稍大但保持“与文字等大”精神——也可以设定与标题接近，但标题太大，所以设定与版权文字接近的两倍左右，但为了明确是等大图标，我们使用1.5rem而周围版权是1.1rem，但图标无背景无框，视觉上仍是纯粹图标 */
+            color: white;
+            text-decoration: none;
+            font-size: 1.6rem;          /* 比正文稍大但保持纯粹图标感 */
             line-height: 1;
-            transition: opacity 0.1s;
             border: none;
-            outline: none;
             background: none;
-            padding: 0;                      /* 彻底无内边距 */
+            padding: 0;
             margin: 0;
             opacity: 0.9;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+            transition: opacity 0.15s;
+            /* 关键：显式指定字体为图标字体 */
+            font-family: 'FaSolid', 'Font Awesome 6 Free', 'FontAwesome', sans-serif;
+            font-weight: 900;
         }
 
         .download-link:hover {
             opacity: 1;
-            color: #ffd9a3;                 /* 仅微变色，不添加任何背景或边框 */
-            text-decoration: none;
+            color: #ffd9a3;
         }
 
-        /* 右上控制 —— 也是纯文字式微标，无背景框，仅作点缀 */
+        /* 右上控制栏：纯文字 + 图标按钮 */
         .top-right {
             position: absolute;
             top: 2rem;
@@ -143,33 +135,32 @@
             gap: 1.2rem;
             align-items: center;
             pointer-events: auto;
-            color: rgba(255, 255, 255, 0.8);
-            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+            color: rgba(255, 255, 255, 0.85);
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
             font-size: 1rem;
-            font-weight: 330;
         }
 
-        /* 日期文本 —— 纯文字 */
         .date-txt {
             font-size: 1rem;
             letter-spacing: 0.5px;
             color: inherit;
         }
 
-        /* 导航按钮 —— 也是纯文字无背景，只显示图标，和文字等大 */
         .nav-btn {
             background: none;
             border: none;
             color: inherit;
-            font-family: 'FaSolid', 'Font Awesome 6 Free', monospace;
-            font-size: 1.3rem;            /* 与旁边日期文字协调，略大但保持纯粹感 */
+            /* 图标字体 */
+            font-family: 'FaSolid', 'Font Awesome 6 Free', 'FontAwesome', sans-serif;
+            font-weight: 900;
+            font-size: 1.4rem;
             line-height: 1;
             cursor: pointer;
             padding: 0;
             margin: 0;
             opacity: 0.85;
             transition: opacity 0.15s;
-            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
         }
 
         .nav-btn:hover {
@@ -177,7 +168,7 @@
             color: #ffffff;
         }
 
-        /* 极简右下角水印 —— 若有若无 */
+        /* 右下角极淡 BING 水印 */
         .bottom-right {
             position: absolute;
             bottom: 2rem;
@@ -190,64 +181,48 @@
             text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
         }
 
-        /* 移动端微调 */
+        /* 移动端适应 */
         @media (max-width: 600px) {
-            .minimal-container {
-                padding: 1.5rem;
-            }
-            .title {
-                font-size: 2rem;
-            }
-            .copyright {
-                font-size: 0.95rem;
-            }
-            .top-right {
-                top: 1.2rem;
-                right: 1.5rem;
-                gap: 0.8rem;
-            }
-            .bottom-right {
-                bottom: 1.2rem;
-                right: 1.5rem;
-            }
+            .minimal-container { padding: 1.5rem; }
+            .title { font-size: 2rem; }
+            .copyright { font-size: 0.95rem; }
+            .top-right { top: 1.2rem; right: 1.5rem; gap: 0.8rem; }
+            .bottom-right { bottom: 1.2rem; right: 1.5rem; }
+            .download-link { font-size: 1.4rem; }
         }
     </style>
 </head>
 <body id="bodyBg">
 
     <div class="minimal-container">
-        <!-- 右上 —— 纯文字日期 + 图标按钮 (无背景) -->
+        <!-- 右上：日期 + 图标按钮 (无背景) -->
         <div class="top-right">
             <span class="date-txt" id="displayDate">2025.01.05 周日</span>
-            <button class="nav-btn" id="prevBtn" title="昨日"></button>   <!-- 左箭头 与文字等大无装饰 -->
-            <button class="nav-btn" id="nextBtn" title="今日"></button>   <!-- 右箭头 刷新/今日 -->
+            <button class="nav-btn" id="prevBtn" title="昨日"></button>   <!-- 左箭头   -->
+            <button class="nav-btn" id="nextBtn" title="今日"></button>   <!-- 右箭头   -->
         </div>
 
-        <!-- 左下 —— 只有纯文字信息 + 与文字等大的下载图标 -->
+        <!-- 左下：纯文字 + 等大下载图标 -->
         <div class="bottom-left">
-            <!-- 纯文字标题 (从版权提炼) -->
-            <div class="title" id="imageTitle">拉文纳·水下地下室</div>
-            <!-- 纯文字版权 (完整版权行) -->
+            <div class="title" id="imageTitle">拉文纳 · 水下地下室</div>
             <div class="copyright" id="copyrightLine">© Andrea Pucci · 圣弗朗西斯教堂, 意大利</div>
-            <!-- 下载图标 —— 单独一行，与文字等大，无任何背景边框，纯粹一个图标 -->
+            <!-- 下载图标：纯图标，与文字等大，无背景 -->
             <div class="download-wrapper">
-                <a href="#" id="downloadLink" class="download-link" download title="下载原始壁纸"></a> <!-- 下载图标  -->
+                <a href="#" id="downloadLink" class="download-link" download title="下载 UHD 原图"></a>   <!-- 下载图标   -->
             </div>
         </div>
 
-        <!-- 右下角极淡必应标记 (纯文字) -->
+        <!-- 右下角水印 -->
         <div class="bottom-right">BING 每日一图</div>
     </div>
 
     <script>
         (function() {
-            // API 配置
+            // ---------- 配置 ----------
             const API_BASE = 'https://bing.biturl.top';
-            const resolution = 'UHD';
-            const mkt = 'zh-CN';
-
-            // 当前索引 0=今天, 1=昨天...
-            let currentIndex = 0;
+            const RESOLUTION = 'UHD';
+            const MKT = 'zh-CN';
+            let currentIndex = 0;  // 0=今日, 1=昨日, ... 最大7
 
             // DOM 元素
             const bodyEl = document.getElementById('bodyBg');
@@ -258,13 +233,12 @@
             const prevBtn = document.getElementById('prevBtn');
             const nextBtn = document.getElementById('nextBtn');
 
-            // 辅助：从完整版权中提取简洁标题（用于title，纯文字）
+            // ---------- 辅助：从完整版权中提取简洁标题 ----------
             function extractShortTitle(fullCopyright) {
                 if (!fullCopyright) return '未知之地';
-                // 去掉 © 及之后内容
                 let beforeCopyright = fullCopyright.split('©')[0].trim();
                 if (beforeCopyright.length === 0) beforeCopyright = fullCopyright;
-                // 如果包含逗号，取前两个部分
+                // 按中文逗号分割，取前两部分
                 let parts = beforeCopyright.split('，');
                 if (parts.length >= 2) {
                     return (parts[0] + ' · ' + parts[1]).replace(/[,，\s]+$/, '');
@@ -274,26 +248,22 @@
                 return beforeCopyright.substring(0, 40);
             }
 
-            // 更新界面：背景、标题、版权、下载链接、日期
+            // ---------- 更新界面 ----------
             function applyImageData(data, index) {
                 if (!data || !data.url) return;
 
-                // 背景
-                bodyEl.style.backgroundImage = `linear-gradient(0deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 100%), url('${data.url}')`;
+                // 背景图（加一点暗层提升文字可读性）
+                bodyEl.style.backgroundImage = `linear-gradient(0deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.4) 100%), url('${data.url}')`;
 
-                // 纯文字标题
                 const fullCopy = data.copyright || '必应每日壁纸';
                 titleEl.innerText = extractShortTitle(fullCopy);
-
-                // 纯文字版权
                 copyrightEl.innerText = fullCopy;
 
-                // 下载图标 —— 链接指向图片地址
+                // 下载链接
                 downloadLink.href = data.url;
-                // 确保download属性 (触发下载提示)
-                downloadLink.setAttribute('download', '');
+                downloadLink.setAttribute('download', '');  // 提示下载
 
-                // 日期处理 (优先使用start_date)
+                // 日期显示
                 if (data.start_date && data.start_date.length === 8) {
                     const y = data.start_date.slice(0,4);
                     const m = data.start_date.slice(4,6);
@@ -303,7 +273,7 @@
                     const wd = weekdays[dateObj.getDay()];
                     displayDate.innerText = `${y}.${m}.${d} ${wd}`;
                 } else {
-                    // fallback 根据索引计算大约日期
+                    // 估算日期（根据索引）
                     const today = new Date();
                     const target = new Date(today);
                     target.setDate(today.getDate() - index);
@@ -316,18 +286,17 @@
                 }
             }
 
-            // 从API获取数据
+            // ---------- 从 API 获取数据 ----------
             async function fetchImage(index) {
-                // 临时占位文字（保持不变，等数据回来）
-                const url = `${API_BASE}/?resolution=${resolution}&format=json&index=${index}&mkt=${mkt}`;
+                const url = `${API_BASE}/?resolution=${RESOLUTION}&format=json&index=${index}&mkt=${MKT}`;
                 try {
                     const resp = await fetch(url);
-                    if (!resp.ok) throw new Error(`status ${resp.status}`);
+                    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
                     const data = await resp.json();
                     applyImageData(data, index);
                 } catch (err) {
-                    console.warn('API失败，使用备用内置图片', err);
-                    // 降级数据 (拉文纳示例)
+                    console.warn('API 请求失败，使用备用图片', err);
+                    // 备用数据（拉文纳大教堂）
                     const fallback = {
                         url: 'https://www.bing.com/th?id=OHR.RavennaBasilica_ZH-CN1406474730_UHD.jpg',
                         copyright: '被水淹没的地下室，圣弗朗西斯大教堂，拉文纳，意大利 (© Andrea Pucci/Getty Images)',
@@ -337,30 +306,29 @@
                 }
             }
 
-            // 昨日 (index +1，限制最大7)
+            // ---------- 交互 ----------
             function goPrev() {
                 if (currentIndex < 7) {
                     currentIndex++;
                 } else {
-                    currentIndex = 7;
+                    currentIndex = 7;  // 最多7天前
                 }
                 fetchImage(currentIndex);
             }
 
-            // 今日 (index = 0)
             function goToday() {
                 currentIndex = 0;
                 fetchImage(currentIndex);
             }
 
-            // 初始化
+            // 初始化加载今日
             fetchImage(0);
 
-            // 事件绑定
+            // 绑定按钮
             prevBtn.addEventListener('click', goPrev);
             nextBtn.addEventListener('click', goToday);
 
-            // 键盘快捷
+            // 键盘支持
             window.addEventListener('keydown', (e) => {
                 if (e.key === 'ArrowLeft') {
                     e.preventDefault();
@@ -371,8 +339,8 @@
                 }
             });
 
-            // 提示归档接口（仅供了解）
-            console.log('历史归档API: https://bing.npanuhin.me/CN/zh.2024.json');
+            // 控制台提示归档接口（可选）
+            console.log('📷 历史归档示例: https://bing.npanuhin.me/CN/zh.2024.json');
         })();
     </script>
 </body>
