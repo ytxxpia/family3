@@ -2,7 +2,8 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes"> 
+    <!-- 关键：添加 viewport 适配移动端 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>家庭空间 · 汇总</title>
     <style>
         /* 极简直角风格，无圆角、无毛玻璃、无阴影、无边框装饰 */
@@ -15,12 +16,14 @@
             min-height: 100vh;
             background: linear-gradient(180deg, #0079FF 0%, #ffffff 100%);
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            /* 基础字体设为 16px，确保 1rem = 16px */
+            font-size: 16px;
             padding: 0;
         }
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 1.5rem 2rem;
+            padding: 1.5rem 1rem; /* 手机上左右内边距适当减小 */
         }
         /* 广告图区域——无任何修饰，直接原生块 */
         .ad-link {
@@ -37,26 +40,26 @@
             border: none;
             background: #e0e8ff; /* 占位背景，图片加载后覆盖 */
         }
-        /* 标题：使用 FontAwesome 图标 */
+        /* 标题：使用 FontAwesome 图标，字体调小一些适合手机 */
         h1 {
-            font-size: 2.4rem;
+            font-size: 2rem;       /* 32px */
             font-weight: 400;
-            margin: 1.5rem 0 1.5rem 0;
+            margin: 1.2rem 0 1.2rem 0;
             letter-spacing: 1px;
             color: #0a1a2f;
         }
         /* 两列布局 */
         .row {
             display: flex;
-            gap: 2rem;
-            margin-bottom: 2.5rem;
+            gap: 1rem;             /* 手机上间隙稍小 */
+            margin-bottom: 2rem;
             flex-wrap: wrap;
         }
         /* 天气块：直角，无特效，纯色极浅背景 */
         .weather-block {
             flex: 1 1 280px;
             background: rgba(255, 255, 255, 0.3);
-            padding: 1.5rem 1.2rem;
+            padding: 1.2rem 1rem;  /* 内边距微调 */
             cursor: pointer;
             border: none;
             border-radius: 0;
@@ -68,22 +71,22 @@
         .weather-display {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.8rem;
         }
         .weather-icon {
-            font-size: 3rem;
+            font-size: 2.5rem;     /* 40px */
             width: 1.5em;
             text-align: center;
             color: #1e3a6b;
         }
         .weather-info {
-            font-size: 1.8rem;
+            font-size: 1.5rem;     /* 24px */
             font-weight: 350;
             line-height: 1.3;
         }
         .expired-warning {
             margin-top: 0.5rem;
-            font-size: 0.9rem;
+            font-size: 0.85rem;    /* 13.6px */
             color: #b91c1c;
             display: flex;
             align-items: center;
@@ -103,34 +106,40 @@
         .daily-image-link iframe {
             width: 100%;
             height: 100%;
-            min-height: 220px;
+            min-height: 200px;      /* 手机上高度稍减 */
             border: none;
             display: block;
             background: rgba(255,255,255,0.2);
-            pointer-events: none; /* 禁止 iframe 内部交互，使点击直接由父链接处理 */
+            pointer-events: none;
         }
         /* 文章列表区域 */
         .article-section {
             background: rgba(255, 255, 255, 0.3);
-            padding: 1.8rem 2rem;
+            padding: 1.2rem 1.2rem;
             border-radius: 0;
+        }
+        .article-section h2 {
+            font-weight: 350;
+            font-size: 1.6rem;      /* 25.6px */
+            margin-bottom: 0.5rem;
         }
         .article-list {
             list-style: none;
-            margin-top: 1rem;
+            margin-top: 0.5rem;
         }
         .article-list li {
             margin-bottom: 0.8rem;
             border-bottom: 1px dashed rgba(0,0,0,0.1);
-            padding-bottom: 0.8rem;
+            padding-bottom: 0.6rem;
         }
         .article-list a {
             text-decoration: none;
             color: #003c8b;
-            font-size: 1.3rem;
+            font-size: 1.1rem;      /* 17.6px 适合手机阅读 */
             display: inline-block;
             transition: opacity 0.1s;
             cursor: pointer;
+            line-height: 1.4;
         }
         .article-list a:hover {
             opacity: 0.8;
@@ -151,9 +160,9 @@
         }
         .modal-content {
             background: white;
-            width: 90%;
+            width: 95%;             /* 手机上宽度占更多 */
             max-width: 500px;
-            height: 400px;
+            height: 450px;          /* 高度稍增，适应手机 */
             padding: 0;
             border-radius: 0;
             position: relative;
@@ -162,12 +171,12 @@
         .modal-close {
             position: absolute;
             top: 8px; right: 12px;
-            font-size: 2rem;
+            font-size: 2.2rem;      /* 35px 更容易点击 */
             color: #333;
             cursor: pointer;
             background: transparent;
-            width: 40px;
-            height: 40px;
+            width: 44px;            /* 增大点击区域 */
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -204,7 +213,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-<!-- 顶端广告图 - 直接贴在body最上方，无间距无装饰，图片改为 ads/ads.png，跳转 apk/app.html -->
+<!-- 顶端广告图 -->
 <a href="apk/app.html" class="ad-link" target="_blank" rel="noopener">
     <img src="ads/ads.png" alt="广告：下载应用" class="ad-img">
 </a>
@@ -225,7 +234,7 @@
             </div>
         </div>
 
-        <!-- 每日一图区域：点击跳转 api/bing.html，iframe 路径改为 api/index-see/index-bing.html，且禁止 iframe 交互以便链接生效 -->
+        <!-- 每日一图区域 -->
         <a href="api/bing.html" target="_blank" rel="noopener" class="daily-image-link">
             <iframe src="api/index-see/index-bing.html" title="每日一图" loading="lazy"></iframe>
         </a>
@@ -233,14 +242,14 @@
 
     <!-- 文章列表区域 -->
     <div class="article-section">
-        <h2 style="font-weight: 350; font-size: 1.8rem;"><i class="fas fa-file-alt"></i> 文章</h2>
+        <h2><i class="fas fa-file-alt"></i> 文章</h2>
         <ul class="article-list" id="articleList">
             <li>加载中…</li>
         </ul>
     </div>
 </div>
 
-<!-- 天气模态框 (只能通过关闭按钮关闭) -->
+<!-- 天气模态框 -->
 <div class="modal" id="weatherModal">
     <div class="modal-content">
         <span class="modal-close" id="closeModalBtn">&times;</span>
@@ -340,13 +349,12 @@
             weatherModule.classList.remove('expired-bg');
             expiryWarningDiv.style.display = 'none';
 
-            // 重要：不再关闭模态框，让用户继续查看详细天气
-            // modal.classList.remove('active');  // 已删除
+            // 不关闭模态框，让用户继续查看详细天气
         }
 
         weatherModule.addEventListener('click', () => {
             modal.classList.add('active');
-            // 每次打开时重新加载 iframe，确保最新
+            // 每次打开重新加载 iframe
             weatherIframe.src = 'api/weather.html';
         });
 
@@ -354,14 +362,11 @@
             modal.classList.remove('active');
         });
 
-        // 注意：不再添加 modal 背景点击关闭，只有关闭按钮可关闭
-
         window.addEventListener('message', (event) => {
             if (event.source !== weatherIframe.contentWindow) return;
             const weatherData = event.data;
-            // 只接受符合格式的消息，避免误触发
             if (typeof weatherData === 'string' && weatherData.includes('/')) {
-                saveWeather(weatherData);  // 只更新缓存和主界面，不关闭模态框
+                saveWeather(weatherData);
             } else {
                 console.warn('未知的天气消息格式', weatherData);
             }
@@ -375,7 +380,7 @@
         async function loadArticles() {
             try {
                 const response = await fetch('blog/list.json');
-                if (!response.ok) throw new Error('无法加载文章列表');
+                if (!response.ok) throw new Error(`HTTP ${response.status} - ${response.statusText}`);
                 const articles = await response.json();
                 if (!Array.isArray(articles)) throw new Error('列表格式错误');
 
@@ -416,7 +421,7 @@
                     });
                 });
             } catch (err) {
-                articleListEl.innerHTML = `<li style="color:#a00;"><i class="fas fa-exclamation-circle"></i> 文章列表加载失败</li>`;
+                articleListEl.innerHTML = `<li style="color:#a00;"><i class="fas fa-exclamation-circle"></i> 文章列表加载失败: ${err.message}</li>`;
                 console.error(err);
             }
         }
