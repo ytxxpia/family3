@@ -4,34 +4,102 @@
     <meta charset="UTF-8">
     <title>天气</title>
     <style>
-        /* 没有任何多余样式：纯原生，无margin，无padding，无字体设置 */
-        body {
-            background-color: #0079FF;
+        /* 字体定义 - FontAwesome */
+        @font-face {
+            font-family: 'FontAwesome';
+            src: url('../FontAwesome/fa-solid-900.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        /* 基础样式 */
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            /* 渐变色背景 */
+            background: linear-gradient(145deg, #0066CC 0%, #4D94FF 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: system-ui, -apple-system, sans-serif;
             color: white;
+            padding: 20px;
         }
-        /* 绝对不定义任何字体，完全使用浏览器默认 */
-        .temp {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            font-size: 120px;        /* 仅保留字号，无字体族 */
+
+        /* 圆角信息框 */
+        .weather-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 40px 60px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            max-width: 500px;
+            width: fit-content;
+        }
+
+        /* 温度 - 巨大 */
+        .temperature {
+            font-size: 120px;  /* 更大 */
+            font-weight: 300;
             line-height: 1;
+            margin-bottom: 15px;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
-        .status {
-            position: absolute;
-            top: 150px;              /* 根据温度字号大致定位 */
-            left: 20px;
+
+        .temperature small {
+            font-size: 48px;   /* 温度单位相应增大 */
+            font-weight: 300;
+            opacity: 0.9;
+            vertical-align: super;
+        }
+
+        /* 天气状态行 - 适中 */
+        .weather-status {
+            font-size: 36px;   /* 比温度小 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* FontAwesome 图标 */
+        .weather-status i {
+            font-family: 'FontAwesome';
+            font-style: normal;
+            font-size: 42px;   /* 图标稍大于文字 */
+        }
+
+        /* 更新时间 - 最小 */
+        .update-time {
+            font-size: 18px;   /* 最小 */
+            opacity: 0.8;
+            margin-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding-top: 15px;
+        }
+
+        /* 加载和错误状态 */
+        .loading, .error {
             font-size: 24px;
+            padding: 20px;
         }
-        /* 没有任何其他元素：无分割线，无按钮，无链接，无脚注 */
     </style>
 </head>
 <body>
-    <!-- 只有两个动态元素：温度 和 状态/时间 -->
-    <div id="tempDisplay" class="temp">--°C</div>
-    <div id="statusDisplay" class="status">--/--:--</div>
+    <div class="weather-card" id="weatherCard">
+        <div id="weatherContent">
+            <div class="loading">加载中...</div>
+        </div>
+    </div>
 
     <script>
         (function() {
@@ -41,10 +109,9 @@
             const DEFAULT_LOCATION = '101200808';  // 荆州
 
             // DOM元素
-            const tempEl = document.getElementById('tempDisplay');
-            const statusEl = document.getElementById('statusDisplay');
+            const weatherContentEl = document.getElementById('weatherContent');
 
-            // 发送postMessage给父页面/opener
+            // 发送postMessage给父页面
             function sendPostMessage(message) {
                 if (window.opener) {
                     window.opener.postMessage(message, '*');
@@ -55,13 +122,67 @@
                 }
             }
 
-            // 从ISO字符串提取小时:分钟 (如 19:50)
+            // 根据天气代码获取FontAwesome图标字符
+            function getWeatherIcon(iconCode) {
+                const iconMap = {
+                    // 晴
+                    '100': '\uf185',  // fa-sun
+                    // 多云
+                    '101': '\uf6c4',  // fa-cloud-sun
+                    '102': '\uf6c4',
+                    '103': '\uf6c4',
+                    // 阴
+                    '104': '\uf0c2',  // fa-cloud
+                    // 雨
+                    '300': '\uf740',  // fa-cloud-rain
+                    '301': '\uf740',
+                    '302': '\uf740',
+                    '303': '\uf740',
+                    '304': '\uf740',
+                    '305': '\uf740',
+                    '306': '\uf740',
+                    '307': '\uf740',
+                    '308': '\uf740',
+                    '309': '\uf740',
+                    '310': '\uf740',
+                    '311': '\uf740',
+                    '312': '\uf740',
+                    '313': '\uf740',
+                    // 雪
+                    '400': '\uf742',  // fa-snowflake
+                    '401': '\uf742',
+                    '402': '\uf742',
+                    '403': '\uf742',
+                    // 雾
+                    '500': '\uf750',  // fa-smog
+                    '501': '\uf750',
+                    '502': '\uf750',
+                    '503': '\uf750',
+                    '504': '\uf750',
+                    '505': '\uf750',
+                    '506': '\uf750',
+                    '507': '\uf750',
+                    '508': '\uf750',
+                    '509': '\uf750',
+                    '510': '\uf750',
+                    '511': '\uf750',
+                    '512': '\uf750',
+                    '513': '\uf750',
+                    '514': '\uf750',
+                    '515': '\uf750',
+                };
+                
+                // 默认图标（云）
+                return iconMap[iconCode] || '\uf0c2';
+            }
+
+            // 从ISO字符串提取小时:分钟
             function extractTime(isoString) {
                 if (!isoString) return '--:--';
                 try {
                     if (isoString.includes('T')) {
                         let timePart = isoString.split('T')[1] || '';
-                        timePart = timePart.split('+')[0].split('-')[0]; // 去除时区
+                        timePart = timePart.split('+')[0].split('-')[0];
                         if (timePart.length >= 5) return timePart.substring(0, 5);
                     }
                     return '--:--';
@@ -70,9 +191,8 @@
                 }
             }
 
-            // 渲染数据：左上温度，下方状态/时间
+            // 渲染数据
             function renderData(data) {
-                // 健壮性处理
                 if (!data || data.code !== '200') {
                     throw new Error('无效数据');
                 }
@@ -80,27 +200,45 @@
                 const now = data.now || {};
                 const temp = now.temp || '--';
                 const text = now.text || '未知';
+                const iconCode = now.icon || '104';
                 const updateTime = data.updateTime || '';
 
                 const timeStr = extractTime(updateTime);
+                const iconChar = getWeatherIcon(iconCode);
 
-                // 更新显示
-                tempEl.textContent = temp + '°C';
-                statusEl.textContent = text + '/' + timeStr;
+                // 构建HTML
+                const html = `
+                    <div class="temperature">${temp}<small>°C</small></div>
+                    <div class="weather-status">
+                        <i>${iconChar}</i>
+                        <span>${text}</span>
+                    </div>
+                    <div class="update-time">${timeStr}</div>
+                `;
 
-                // 发送消息：格式 "温度℃/天气情况"
-                sendPostMessage(temp + '℃/' + text);
+                weatherContentEl.innerHTML = html;
+
+                // 发送postMessage
+                sendPostMessage(`${temp}℃/${text}`);
             }
 
-            // 显示错误状态（左上仍显示，但尽量简单）
+            // 显示错误
             function showError() {
-                tempEl.textContent = '--°C';
-                statusEl.textContent = 'Error/--:--';
+                weatherContentEl.innerHTML = `
+                    <div class="temperature">--<small>°C</small></div>
+                    <div class="weather-status">
+                        <i>\uf071</i>
+                        <span>Error</span>
+                    </div>
+                    <div class="update-time">--:--</div>
+                `;
                 sendPostMessage('--℃/Error');
             }
 
             // 获取真实数据
             async function fetchWeather() {
+                weatherContentEl.innerHTML = '<div class="loading">加载中...</div>';
+                
                 const url = `https://${API_HOST}/v7/weather/now?location=${DEFAULT_LOCATION}&key=${API_KEY}`;
                 try {
                     const resp = await fetch(url);
@@ -116,9 +254,6 @@
 
             // 页面加载立即请求
             window.addEventListener('load', fetchWeather);
-
-            // 注意：本页面没有任何多余元素，只有左上角的温度和状态。
-            // 完全符合要求：无分割线、无刷新按钮、无链接、无字体定义、无表情。
         })();
     </script>
 </body>
