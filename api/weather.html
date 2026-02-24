@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>天气</title>
+    <style>
+        /* 没有任何多余样式：纯原生，无margin，无padding，无字体设置 */
+        body {
+            background-color: #0079FF;
+            margin: 0;
+            padding: 0;
+            color: white;
+        }
+        /* 绝对不定义任何字体，完全使用浏览器默认 */
+        .temp {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 120px;        /* 仅保留字号，无字体族 */
+            line-height: 1;
+        }
+        .status {
+            position: absolute;
+            top: 150px;              /* 根据温度字号大致定位 */
+            left: 20px;
+            font-size: 24px;
+        }
+        /* 没有任何其他元素：无分割线，无按钮，无链接，无脚注 */
+    </style>
+</head>
+<body>
+    <!-- 只有两个动态元素：温度 和 状态/时间 -->
+    <div id="tempDisplay" class="temp">--°C</div>
+    <div id="statusDisplay" class="status">--/--:--</div>
+
+    <script>
+        (function() {
+            // 硬编码配置
+            const API_KEY = '65b7248e52844cd9bf286704d523b39b';
+            const API_HOST = 'nk6apxegjc.re.qweatherapi.com';
+            const DEFAULT_LOCATION = '101200808';  // 荆州
+
+            // DOM元素
+            const tempEl = document.getElementById('tempDisplay');
+            const statusEl = document.getElementById('statusDisplay');
+
+            // 发送postMessage给父页面/opener
+            function sendPostMessage(message) {
+                if (window.opener) {
+                    window.opener.postMessage(message, '*');
+                } else if (window.parent !== window) {
+                    window.parent.postMessage(message, '*');
+                } else {
+                    console.log('postMessage内容:', message);
+                }
+            }
+
+            // 从ISO字符串提取小时:分钟 (如 19:50)
+            function extractTime(isoString) {
+                if (!isoString) return '--:--';
+                try {
+                    if (isoString.includes('T')) {
+                        let timePart = isoString.split('T')[1] || '';
+                        timePart = timePart.split('+')[0].split('-')[0]; // 去除时区
+                        if (timePart.length >= 5) return timePart.substring(0, 5);
+                    }
+                    return '--:--';
+                } catch (e) {
+                    return '--:--';
+                }
+            }
+
+            // 渲染数据：左上温度，下方状态/时间
+            function renderData(data) {
+                // 健壮性处理
+                if (!data || data.code !== '200') {
+                    throw new Error('无效数据');
+                }
+
+                const now = data.now || {};
+                const temp = now.temp || '--';
+                const text = now.text || '未知';
+                const updateTime = data.updateTime || '';
+
+                const timeStr = extractTime(updateTime);
+
+                // 更新显示
+                tempEl.textContent = temp + '°C';
+                statusEl.textContent = text + '/' + timeStr;
+
+                // 发送消息：格式 "温度℃/天气情况"
+                sendPostMessage(temp + '℃/' + text);
+            }
+
+            // 显示错误状态（左上仍显示，但尽量简单）
+            function showError() {
+                tempEl.textContent = '--°C';
+                statusEl.textContent = 'Error/--:--';
+                sendPostMessage('--℃/Error');
+            }
+
+            // 获取真实数据
+            async function fetchWeather() {
+                const url = `https://${API_HOST}/v7/weather/now?location=${DEFAULT_LOCATION}&key=${API_KEY}`;
+                try {
+                    const resp = await fetch(url);
+                    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                    const json = await resp.json();
+                    if (json.code !== '200') throw new Error('API码 ' + json.code);
+                    renderData(json);
+                } catch (err) {
+                    console.error(err);
+                    showError();
+                }
+            }
+
+            // 页面加载立即请求
+            window.addEventListener('load', fetchWeather);
+
+            // 注意：本页面没有任何多余元素，只有左上角的温度和状态。
+            // 完全符合要求：无分割线、无刷新按钮、无链接、无字体定义、无表情。
+        })();
+    </script>
+</body>
+</html>
