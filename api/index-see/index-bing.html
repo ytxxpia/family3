@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>必应每日一图 · 标题加粗版</title>
+    <style>
+        /* 极致精简：仅图片 + 加粗标题 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background-color: #0a1017;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            font-family: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif;
+            color: white;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+            position: relative;
+        }
+
+        /* 标题容器：左下角固定 */
+        .title-overlay {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            max-width: 80%;
+            z-index: 10;
+            line-height: 1.2;
+        }
+
+        /* 标题：加粗（由350改为700） */
+        .title {
+            font-size: clamp(1.8rem, 6vw, 3.2rem);
+            font-weight: 700;        /* 加粗 */
+            letter-spacing: -0.01em;
+            word-break: break-word;
+        }
+
+        @media (max-width: 480px) {
+            .title-overlay {
+                bottom: 1.2rem;
+                left: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body id="bodyBg">
+    <!-- 左下角仅加粗标题 -->
+    <div class="title-overlay">
+        <div class="title" id="imageTitle">拉文纳 · 水下地下室</div>
+    </div>
+
+    <script>
+        (function() {
+            const API_BASE = 'https://bing.biturl.top';
+            const RESOLUTION = 'UHD';
+            const MKT = 'zh-CN';
+            const INDEX = 0;
+
+            const bodyEl = document.getElementById('bodyBg');
+            const titleEl = document.getElementById('imageTitle');
+
+            function extractShortTitle(fullCopyright) {
+                if (!fullCopyright) return '未知之地';
+                let beforeCopyright = fullCopyright.split('©')[0].trim();
+                if (beforeCopyright.length === 0) beforeCopyright = fullCopyright;
+                let parts = beforeCopyright.split('，');
+                if (parts.length >= 2) {
+                    return (parts[0] + ' · ' + parts[1]).replace(/[,，\s]+$/, '');
+                } else if (parts.length === 1) {
+                    return parts[0].replace(/[,，]+$/, '');
+                }
+                return beforeCopyright.substring(0, 40);
+            }
+
+            function applyImageData(data) {
+                if (!data || !data.url) return;
+                bodyEl.style.backgroundImage = `linear-gradient(0deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.3) 100%), url('${data.url}')`;
+                const fullCopy = data.copyright || '必应每日壁纸';
+                titleEl.innerText = extractShortTitle(fullCopy);
+            }
+
+            async function fetchTodaysImage() {
+                const url = `${API_BASE}/?resolution=${RESOLUTION}&format=json&index=${INDEX}&mkt=${MKT}`;
+                try {
+                    const resp = await fetch(url);
+                    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                    const data = await resp.json();
+                    applyImageData(data);
+                } catch (err) {
+                    console.warn('API失败，使用备用图片', err);
+                    const fallback = {
+                        url: 'https://www.bing.com/th?id=OHR.RavennaBasilica_ZH-CN1406474730_UHD.jpg',
+                        copyright: '被水淹没的地下室，圣弗朗西斯大教堂，拉文纳，意大利 (© Andrea Pucci/Getty Images)',
+                    };
+                    applyImageData(fallback);
+                }
+            }
+
+            fetchTodaysImage();
+        })();
+    </script>
+</body>
+</html>
