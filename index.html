@@ -35,7 +35,7 @@
             width: 100%;
             height: auto;
             border: none;
-            background: #e0e8ff;
+            background: #e0e8ff; /* 占位背景，图片加载后覆盖 */
         }
         /* 标题：使用 FontAwesome 图标 */
         h1 {
@@ -89,20 +89,25 @@
             align-items: center;
             gap: 0.4rem;
         }
-        /* 每日一图 iframe 块 */
-        .daily-image {
+        /* 每日一图容器：作为链接，覆盖整个区域 */
+        .daily-image-link {
             flex: 2 1 400px;
+            display: block;
+            text-decoration: none;
+            color: inherit;
             background: transparent;
             border-radius: 0;
             overflow: hidden;
+            cursor: pointer;
         }
-        .daily-image iframe {
+        .daily-image-link iframe {
             width: 100%;
             height: 100%;
             min-height: 220px;
             border: none;
             display: block;
             background: rgba(255,255,255,0.2);
+            pointer-events: none; /* 禁止 iframe 内部交互，使点击直接由父链接处理 */
         }
         /* 文章列表区域 */
         .article-section {
@@ -199,10 +204,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-<!-- 顶端广告图 - 直接贴在body最上方，无间距无装饰 -->
-<a href="apk/app.apk" class="ad-link" target="_blank" rel="noopener">
-    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='200' viewBox='0 0 1200 200'%3E%3Crect width='1200' height='200' fill='%234286f5'/%3E%3Ctext x='60' y='130' font-family='system-ui, sans-serif' font-size='48' fill='white' font-weight='bold'%3E📱 点击下载 APP %3C/text%3E%3C/svg%3E"
-         alt="广告：下载应用" class="ad-img">
+<!-- 顶端广告图 - 直接贴在body最上方，无间距无装饰，图片改为 ads/ads.png，跳转 apk/app.html -->
+<a href="apk/app.html" class="ad-link" target="_blank" rel="noopener">
+    <img src="ads/ads.png" alt="广告：下载应用" class="ad-img">
 </a>
 
 <div class="container">
@@ -221,10 +225,10 @@
             </div>
         </div>
 
-        <!-- 每日一图 iframe -->
-        <div class="daily-image">
-            <iframe src="api/index-see/see-bing.html" title="每日一图" loading="lazy"></iframe>
-        </div>
+        <!-- 每日一图区域：点击跳转 api/bing.html，iframe 路径改为 api/index-see/index-bing.html，且禁止 iframe 交互以便链接生效 -->
+        <a href="api/bing.html" target="_blank" rel="noopener" class="daily-image-link">
+            <iframe src="api/index-see/index-bing.html" title="每日一图" loading="lazy"></iframe>
+        </a>
     </div>
 
     <!-- 文章列表区域 -->
@@ -236,7 +240,7 @@
     </div>
 </div>
 
-<!-- 天气模态框 -->
+<!-- 天气模态框 (只能通过关闭按钮关闭) -->
 <div class="modal" id="weatherModal">
     <div class="modal-content">
         <span class="modal-close" id="closeModalBtn">&times;</span>
@@ -348,11 +352,7 @@
             modal.classList.remove('active');
         });
 
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.classList.remove('active');
-            }
-        });
+        // 注意：不再添加 modal 背景点击关闭，只有关闭按钮可关闭
 
         window.addEventListener('message', (event) => {
             if (event.source !== weatherIframe.contentWindow) return;
@@ -413,7 +413,6 @@
                     });
                 });
             } catch (err) {
-                // 将原来的 ❌ 替换为 FontAwesome 图标
                 articleListEl.innerHTML = `<li style="color:#a00;"><i class="fas fa-exclamation-circle"></i> 文章列表加载失败</li>`;
                 console.error(err);
             }
