@@ -321,7 +321,7 @@
             }
         }
 
-        function saveWeatherAndClose(weatherStr) {
+        function saveWeather(weatherStr) {
             if (!weatherStr || !weatherStr.includes('/')) return;
 
             const parts = weatherStr.split('/');
@@ -340,11 +340,13 @@
             weatherModule.classList.remove('expired-bg');
             expiryWarningDiv.style.display = 'none';
 
-            modal.classList.remove('active');
+            // 重要：不再关闭模态框，让用户继续查看详细天气
+            // modal.classList.remove('active');  // 已删除
         }
 
         weatherModule.addEventListener('click', () => {
             modal.classList.add('active');
+            // 每次打开时重新加载 iframe，确保最新
             weatherIframe.src = 'api/weather.html';
         });
 
@@ -357,8 +359,9 @@
         window.addEventListener('message', (event) => {
             if (event.source !== weatherIframe.contentWindow) return;
             const weatherData = event.data;
+            // 只接受符合格式的消息，避免误触发
             if (typeof weatherData === 'string' && weatherData.includes('/')) {
-                saveWeatherAndClose(weatherData);
+                saveWeather(weatherData);  // 只更新缓存和主界面，不关闭模态框
             } else {
                 console.warn('未知的天气消息格式', weatherData);
             }
