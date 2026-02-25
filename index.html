@@ -11,34 +11,41 @@
             margin: 0;
             padding: 0;
         }
+        html {
+            -webkit-text-size-adjust: 100%;
+        }
         body {
             min-height: 100vh;
             background: linear-gradient(180deg, #0079FF 0%, #ffffff 100%);
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            font-size: 16px; /* 基准1rem=16px */
+            font-size: 16px;
             padding: 0;
+        }
+        @media (max-width: 400px) {
+            body { font-size: 14px; }
+        }
+        @media (min-width: 401px) and (max-width: 600px) {
+            body { font-size: 15px; }
         }
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 1.5rem 1rem;
         }
-        /* 标题：字号略减 */
         h1 {
-            font-size: 1.8rem;       /* 28.8px */
+            font-size: 1.8rem;
             font-weight: 400;
             margin: 1rem 0 1.2rem 0;
             letter-spacing: 1px;
             color: #0a1a2f;
         }
-        /* 两列布局 */
         .row {
             display: flex;
             gap: 1rem;
             margin-bottom: 2rem;
             flex-wrap: wrap;
         }
-        /* 天气块：直角 → 6px圆角 */
+        /* 天气块：相对定位，为图表按钮留位置 */
         .weather-block {
             flex: 1 1 280px;
             background: rgba(255, 255, 255, 0.3);
@@ -46,8 +53,8 @@
             cursor: pointer;
             border: none;
             border-radius: 6px;
+            position: relative;
         }
-        /* 过期警告背景 */
         .weather-block.expired-bg {
             background-color: #ffe5e5;
         }
@@ -57,45 +64,65 @@
             gap: 0.8rem;
         }
         .weather-icon {
-            font-size: 2.2rem;       /* 35.2px */
+            font-size: 2.2rem;
             width: 1.5em;
             text-align: center;
             color: #1e3a6b;
         }
         .weather-info {
-            font-size: 1.3rem;       /* 20.8px */
+            font-size: 1.3rem;
             font-weight: 350;
             line-height: 1.3;
         }
         .expired-warning {
             margin-top: 0.5rem;
-            font-size: 0.8rem;       /* 12.8px */
+            font-size: 0.8rem;
             color: #b91c1c;
             display: flex;
             align-items: center;
             gap: 0.4rem;
         }
-        /* 每日一图容器：强制16:9，6px圆角 */
+        /* 图表按钮 */
+        .chart-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(255,255,255,0.5);
+            border: none;
+            border-radius: 4px;
+            padding: 0.4rem 0.6rem;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #1e3a6b;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            z-index: 5;
+        }
+        .chart-btn:hover {
+            background: rgba(255,255,255,0.8);
+        }
+        /* 每日一图容器：强制16:9 */
         .daily-image-link {
-            flex: 2 1 400px;          /* 保持弹性，基础宽度400px */
-            aspect-ratio: 16 / 9;      /* 关键：强制16:9比例 */
+            flex: 2 1 400px;
+            aspect-ratio: 16 / 9;
             display: block;
             text-decoration: none;
             color: inherit;
             background: transparent;
             border-radius: 6px;
-            overflow: hidden;         /* 确保 iframe 也显示圆角 */
+            overflow: hidden;
             cursor: pointer;
         }
         .daily-image-link iframe {
             width: 100%;
-            height: 100%;              /* 填充父容器，保持比例 */
+            height: 100%;
             border: none;
             display: block;
             background: rgba(255,255,255,0.2);
-            pointer-events: none;      /* 使点击由父链接处理 */
+            pointer-events: none;
         }
-        /* 文章列表区域：6px圆角 */
+        /* 文章列表区域 */
         .article-section {
             background: rgba(255, 255, 255, 0.3);
             padding: 1.2rem 1.2rem;
@@ -103,7 +130,7 @@
         }
         .article-section h2 {
             font-weight: 350;
-            font-size: 1.5rem;        /* 24px */
+            font-size: 1.5rem;
             margin-bottom: 0.5rem;
         }
         .article-list {
@@ -118,7 +145,7 @@
         .article-list a {
             text-decoration: none;
             color: #003c8b;
-            font-size: 1rem;          /* 16px */
+            font-size: 1rem;
             display: inline-block;
             transition: opacity 0.1s;
             cursor: pointer;
@@ -128,7 +155,7 @@
             opacity: 0.8;
             text-decoration: underline;
         }
-        /* 模态框 */
+        /* 模态框通用样式 */
         .modal {
             display: none;
             position: fixed;
@@ -145,22 +172,22 @@
             background: white;
             width: 95%;
             max-width: 500px;
-            height: 450px;
-            padding: 0;
-            border-radius: 6px;       /* 小圆角 */
+            padding: 1rem;
+            border-radius: 6px;
             position: relative;
             border: none;
-            overflow: hidden;         /* 裁剪 iframe 为圆角 */
+            max-height: 90vh;
+            overflow-y: auto;
         }
         .modal-close {
             position: absolute;
             top: 8px; right: 12px;
-            font-size: 2.2rem;
+            font-size: 2rem;
             color: #333;
             cursor: pointer;
             background: transparent;
-            width: 44px;
-            height: 44px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -168,11 +195,31 @@
             border: none;
             font-weight: 300;
         }
-        .modal iframe {
+        /* 图表模态框中的画布 */
+        .chart-canvas {
+            width: 100%;
+            height: auto;
+            max-height: 300px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        .chart-title {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            font-weight: 350;
+        }
+        /* 天气模态框内 iframe 占满 */
+        #weatherModal .modal-content {
+            padding: 0;
+            height: 450px;
+            width: 95%;
+            max-width: 500px;
+            overflow: hidden;
+        }
+        #weatherModal iframe {
             width: 100%;
             height: 100%;
             border: none;
-            border-radius: 0;         /* 无圆角，但父容器 overflow:hidden 会裁剪 */
         }
         /* 图标字体 */
         @font-face {
@@ -201,8 +248,9 @@
     <h1><i class="fas fa-home"></i> 家庭空间</h1>
 
     <div class="row">
-        <!-- 天气模块 -->
+        <!-- 天气模块（增加图表按钮） -->
         <div class="weather-block" id="weatherModule">
+            <button class="chart-btn" id="chartBtn" title="查看历史温度曲线"><i class="fas fa-chart-line"></i> 图表</button>
             <div class="weather-display" id="weatherDisplay">
                 <span class="weather-icon" id="weatherIcon"><i class="fas fa-sun"></i></span>
                 <span class="weather-info" id="weatherText">--℃/-</span>
@@ -213,7 +261,7 @@
             </div>
         </div>
 
-        <!-- 每日一图区域：强制16:9 -->
+        <!-- 每日一图区域 -->
         <a href="api/bing.html" target="_blank" rel="noopener" class="daily-image-link">
             <iframe src="api/index-see/index-bing.html" title="每日一图" loading="lazy"></iframe>
         </a>
@@ -228,7 +276,7 @@
     </div>
 </div>
 
-<!-- 天气模态框 -->
+<!-- 天气模态框（用于更新天气） -->
 <div class="modal" id="weatherModal">
     <div class="modal-content">
         <span class="modal-close" id="closeModalBtn">&times;</span>
@@ -236,8 +284,18 @@
     </div>
 </div>
 
+<!-- 图表模态框 -->
+<div class="modal" id="chartModal">
+    <div class="modal-content">
+        <span class="modal-close" id="closeChartBtn">&times;</span>
+        <div class="chart-title"><i class="fas fa-temperature-low"></i> 最近7天温度趋势（虚线为预估）</div>
+        <canvas id="tempChart" class="chart-canvas" width="400" height="200"></canvas>
+    </div>
+</div>
+
 <script>
     (function() {
+        // ---------- 配置 ----------
         const STORAGE_KEY = 'weather_cache';
         const EXPIRY_MS = 8 * 60 * 60 * 1000;
 
@@ -253,14 +311,84 @@
         ];
         const DEFAULT_ICON = 'sun';
 
+        // DOM 元素
         const weatherModule = document.getElementById('weatherModule');
         const weatherIconSpan = document.getElementById('weatherIcon');
         const weatherTextSpan = document.getElementById('weatherText');
         const expiryWarningDiv = document.getElementById('expiryWarning');
-        const modal = document.getElementById('weatherModal');
+        const weatherModal = document.getElementById('weatherModal');
         const closeModalBtn = document.getElementById('closeModalBtn');
         const weatherIframe = document.getElementById('weatherIframe');
+        const chartBtn = document.getElementById('chartBtn');
+        const chartModal = document.getElementById('chartModal');
+        const closeChartBtn = document.getElementById('closeChartBtn');
+        const chartCanvas = document.getElementById('tempChart');
 
+        // ---------- IndexedDB 初始化 ----------
+        let db;
+        const DB_NAME = 'WeatherDB';
+        const STORE_NAME = 'weatherRecords';
+
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, 1);
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        // 创建存储，使用时间戳作为键
+                        const store = db.createObjectStore(STORE_NAME, { keyPath: 'timestamp' });
+                        store.createIndex('timestamp', 'timestamp', { unique: true });
+                    }
+                };
+            });
+        }
+
+        // 保存一条天气记录
+        async function saveWeatherRecord(temperature, condition) {
+            if (!db) await openDB();
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            const store = tx.objectStore(STORE_NAME);
+            const record = {
+                timestamp: Date.now(),
+                temperature: temperature, // 数值型
+                condition: condition
+            };
+            return new Promise((resolve, reject) => {
+                const request = store.add(record);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // 获取最近 N 条记录（按时间倒序）
+        async function getRecentRecords(limit = 7) {
+            if (!db) await openDB();
+            const tx = db.transaction(STORE_NAME, 'readonly');
+            const store = tx.objectStore(STORE_NAME);
+            const index = store.index('timestamp');
+            return new Promise((resolve, reject) => {
+                const records = [];
+                // 按时间戳从大到小（最新的在前）
+                const request = index.openCursor(null, 'prev');
+                request.onsuccess = (event) => {
+                    const cursor = event.target.result;
+                    if (cursor && records.length < limit) {
+                        records.push(cursor.value);
+                        cursor.continue();
+                    } else {
+                        resolve(records);
+                    }
+                };
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // ---------- 工具函数 ----------
         function getIconClass(weatherDesc) {
             if (!weatherDesc) return DEFAULT_ICON;
             const lower = weatherDesc.toLowerCase();
@@ -309,14 +437,20 @@
             }
         }
 
-        function saveWeather(weatherStr) {
+        // 处理收到的天气消息
+        async function saveWeather(weatherStr) {
             if (!weatherStr || !weatherStr.includes('/')) return;
 
             const parts = weatherStr.split('/');
-            const temperature = parts[0];
+            const temperaturePart = parts[0]; // 例如 "25℃" 或 "-5℃"
             const weatherDesc = parts[1] || '';
+            // 提取数字温度（去掉℃）
+            const tempNum = parseFloat(temperaturePart.replace('℃', ''));
+            if (isNaN(tempNum)) return;
+
             const iconClass = getIconClass(weatherDesc);
 
+            // 存入 localStorage（原有逻辑）
             const cacheData = {
                 value: weatherStr,
                 icon: iconClass,
@@ -328,18 +462,187 @@
             weatherModule.classList.remove('expired-bg');
             expiryWarningDiv.style.display = 'none';
 
-            // 不关闭模态框
+            // 存入 IndexedDB
+            try {
+                await saveWeatherRecord(tempNum, weatherDesc);
+                console.log('天气记录已保存');
+            } catch (e) {
+                console.error('保存天气记录失败', e);
+            }
         }
 
-        weatherModule.addEventListener('click', () => {
-            modal.classList.add('active');
+        // ---------- 绘制图表 ----------
+        async function drawTemperatureChart() {
+            const records = await getRecentRecords(7); // 最近7条，按时间倒序
+            // 转为按时间正序（旧到新）方便绘图
+            records.reverse(); // 现在最早的在前面
+
+            if (records.length === 0) {
+                // 无数据，显示提示
+                const ctx = chartCanvas.getContext('2d');
+                ctx.clearRect(0, 0, chartCanvas.width, chartCanvas.height);
+                ctx.font = '14px system-ui';
+                ctx.fillStyle = '#666';
+                ctx.fillText('暂无历史数据', 20, 100);
+                return;
+            }
+
+            // 提取温度数组和日期标签
+            const temps = records.map(r => r.temperature);
+            const labels = records.map(r => {
+                const d = new Date(r.timestamp);
+                return `${d.getMonth()+1}/${d.getDate()}`;
+            });
+
+            // 预估未来3天温度（基于最后两天的变化）
+            const futureCount = 3;
+            let futureTemps = [];
+            if (temps.length >= 2) {
+                const last = temps[temps.length-1];
+                const prev = temps[temps.length-2];
+                const step = last - prev; // 变化量
+                for (let i = 1; i <= futureCount; i++) {
+                    futureTemps.push(last + step * i);
+                }
+            } else if (temps.length === 1) {
+                // 只有一天，未来相同
+                futureTemps = Array(futureCount).fill(temps[0]);
+            } else {
+                futureTemps = Array(futureCount).fill(0);
+            }
+
+            // 绘图准备
+            const ctx = chartCanvas.getContext('2d');
+            const width = chartCanvas.width;
+            const height = chartCanvas.height;
+            ctx.clearRect(0, 0, width, height);
+
+            const padding = 30;
+            const graphWidth = width - padding * 2;
+            const graphHeight = height - padding * 2;
+
+            // 找到温度范围
+            const allTemps = temps.concat(futureTemps);
+            const minTemp = Math.min(...allTemps) - 2;
+            const maxTemp = Math.max(...allTemps) + 2;
+
+            // 映射函数
+            const mapX = (index, total) => padding + (index / (total-1)) * graphWidth;
+            const mapY = (temp) => height - padding - ((temp - minTemp) / (maxTemp - minTemp)) * graphHeight;
+
+            // 绘制坐标轴
+            ctx.beginPath();
+            ctx.strokeStyle = '#ccc';
+            ctx.lineWidth = 1;
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, height - padding);
+            ctx.lineTo(width - padding, height - padding);
+            ctx.stroke();
+
+            // 绘制历史折线（实线）
+            if (temps.length >= 2) {
+                ctx.beginPath();
+                ctx.strokeStyle = '#0079FF';
+                ctx.lineWidth = 2;
+                for (let i = 0; i < temps.length; i++) {
+                    const x = mapX(i, temps.length);
+                    const y = mapY(temps[i]);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+
+                // 绘制数据点
+                for (let i = 0; i < temps.length; i++) {
+                    const x = mapX(i, temps.length);
+                    const y = mapY(temps[i]);
+                    ctx.beginPath();
+                    ctx.fillStyle = '#0079FF';
+                    ctx.arc(x, y, 4, 0, 2*Math.PI);
+                    ctx.fill();
+                    ctx.fillStyle = 'white';
+                    ctx.arc(x, y, 2, 0, 2*Math.PI);
+                    ctx.fill();
+                }
+            }
+
+            // 绘制预估虚线（未来）
+            if (futureTemps.length > 0) {
+                const startX = mapX(temps.length-1, temps.length); // 最后一个历史点的x
+                const startY = mapY(temps[temps.length-1]);
+                ctx.beginPath();
+                ctx.strokeStyle = '#ff9900';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 3]);
+                ctx.moveTo(startX, startY);
+                for (let i = 0; i < futureTemps.length; i++) {
+                    // 未来点的x位置，假设未来点均匀分布在历史点之后
+                    const futureIndex = temps.length + i;
+                    const totalPoints = temps.length + futureTemps.length;
+                    const x = mapX(futureIndex, totalPoints);
+                    const y = mapY(futureTemps[i]);
+                    ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+                ctx.setLineDash([]); // 恢复实线
+
+                // 绘制未来点（空心）
+                for (let i = 0; i < futureTemps.length; i++) {
+                    const futureIndex = temps.length + i;
+                    const totalPoints = temps.length + futureTemps.length;
+                    const x = mapX(futureIndex, totalPoints);
+                    const y = mapY(futureTemps[i]);
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#ff9900';
+                    ctx.lineWidth = 2;
+                    ctx.arc(x, y, 4, 0, 2*Math.PI);
+                    ctx.stroke();
+                }
+            }
+
+            // 绘制标签（只画部分，避免重叠）
+            ctx.fillStyle = '#333';
+            ctx.font = '10px system-ui';
+            for (let i = 0; i < temps.length; i++) {
+                const x = mapX(i, temps.length);
+                ctx.fillText(labels[i], x-15, height-padding+15);
+            }
+        }
+
+        // ---------- 事件绑定 ----------
+        // 打开天气模态框
+        weatherModule.addEventListener('click', (e) => {
+            // 防止点击图表按钮时也触发
+            if (e.target.closest('.chart-btn')) return;
+            weatherModal.classList.add('active');
             weatherIframe.src = 'api/weather.html';
         });
 
+        // 关闭天气模态框
         closeModalBtn.addEventListener('click', () => {
-            modal.classList.remove('active');
+            weatherModal.classList.remove('active');
         });
 
+        // 图表按钮点击
+        chartBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            chartModal.classList.add('active');
+            await drawTemperatureChart();
+        });
+
+        // 关闭图表模态框
+        closeChartBtn.addEventListener('click', () => {
+            chartModal.classList.remove('active');
+        });
+
+        // 点击模态框背景关闭（仅图表模态框可背景关闭，天气模态框仅按钮关闭）
+        chartModal.addEventListener('click', (e) => {
+            if (e.target === chartModal) {
+                chartModal.classList.remove('active');
+            }
+        });
+
+        // 接收天气 iframe 消息
         window.addEventListener('message', (event) => {
             if (event.source !== weatherIframe.contentWindow) return;
             const weatherData = event.data;
@@ -350,9 +653,15 @@
             }
         });
 
-        loadCachedWeather();
+        // 初始化 IndexedDB 并加载缓存
+        openDB().then(() => {
+            loadCachedWeather();
+        }).catch(err => {
+            console.error('IndexedDB 初始化失败', err);
+            loadCachedWeather(); // 降级使用 localStorage
+        });
 
-        // 文章列表
+        // ---------- 文章列表 ----------
         const articleListEl = document.getElementById('articleList');
 
         async function loadArticles() {
